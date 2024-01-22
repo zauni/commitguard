@@ -1,20 +1,5 @@
-```ts
-const message = "type(scope): subject";
-const actual = await parse(message);
-const expected = {
-  body: null,
-  footer: null,
-  header: "type(scope): subject",
-  mentions: [],
-  merge: null,
-  notes: [],
-  raw: "type(scope): subject",
-  references: [],
-  revert: null,
-  scope: "scope",
-  subject: "subject",
-  type: "type",
-};
+# commitlint-rs
 
-expect(actual).toMatchObject(expected);
-```
+> A commitlint implementation in Rust.
+
+It's a project to learn Rust, so don't expect production ready code. If anybody has suggestions to make it better, please feel free to open an issue!
