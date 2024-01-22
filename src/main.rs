@@ -19,6 +19,8 @@ struct Commit {
     scope: Option<String>,
     /// The subject of the commit message
     subject: String,
+    /// The raw commit message
+    raw: String,
 }
 
 fn parse_commit(pairs: pest::iterators::Pairs<Rule>) -> Commit {
@@ -29,11 +31,14 @@ fn parse_commit(pairs: pest::iterators::Pairs<Rule>) -> Commit {
         commit_type: String::new(),
         scope: None,
         subject: String::new(),
+        raw: String::new(),
     };
 
     for pair in pairs {
         match pair.as_rule() {
             Rule::commit => {
+                commit.raw = pair.as_str().to_string();
+
                 for inner_pair in pair.into_inner() {
                     match inner_pair.as_rule() {
                         Rule::header => {
