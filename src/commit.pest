@@ -1,0 +1,17 @@
+commit = { SOI ~ header ~ body? ~ footer? ~ EOI }
+
+header = ${ commit_type ~ scope? ~ "!"? ~ ":" ~ WHITE_SPACE+ ~ subject }
+
+commit_type = @{ ASCII_ALPHANUMERIC+ }
+
+scope = @{ "(" ~ ASCII_ALPHANUMERIC+ ~ ")" }
+
+subject = @{ text_without_newline }
+
+body = { NEWLINE{2, } ~ (!footer_start ~ ANY)+ }
+
+footer_start = @{ NEWLINE{2, } ~ PEEK_ALL ~ text_without_newline ~ EOI }
+
+footer = @{ footer_start ~ ANY* }
+
+text_without_newline = { (!NEWLINE ~ ANY)+ }
