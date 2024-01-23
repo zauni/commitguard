@@ -13,6 +13,8 @@ It's a project to learn Rust, so don't expect production ready code. If anybody 
 5. Use and parse CLI args (probably with [Clap](https://docs.rs/clap/latest/clap/index.html))
 6. Publish on npm
 7. Dogfood it to lint our own commit messages
-8. Benchmark against original [commitlint](https://github.com/conventional-changelog/commitlint)
-9. Migration docs from original commitlint to commitlint-rs
-10. Allow 3rd party rules? Maybe WASM?
+8. Add website (probably Github pages) and add links to rule details
+9. Add devcontainer for easier getting started in VSCode
+10. Benchmark against original [commitlint](https://github.com/conventional-changelog/commitlint)
+11. Migration docs from original commitlint to commitlint-rs
+12. Allow 3rd party rules? Maybe WASM?
