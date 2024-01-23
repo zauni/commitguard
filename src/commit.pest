@@ -10,6 +10,6 @@ subject = @{ text_without_newline }
 
 body = { NEWLINE{2, } ~ (!footer ~ ANY)+ }
 
-footer = @{ NEWLINE{2, } ~ PEEK_ALL ~ text_without_newline ~ EOI ~ ANY* }
+footer = @{ NEWLINE{2, } ~ text_without_newline ~ EOI }
 
 text_without_newline = { (!NEWLINE ~ ANY)+ }

@@ -1,69 +1,65 @@
-use pest::Parser;
+use pest::{Parser, Span};
 use pest_derive::Parser;
+
+use miette::{miette, LabeledSpan, Report, Result};
 
 #[derive(Parser)]
 #[grammar = "commit.pest"]
 struct CommitParser;
 
 #[derive(Debug)]
-struct Commit {
+struct Commit<'a> {
     /// The complete header of the commit message including the type, scope and subject
-    header: String,
+    header: Span<'a>,
     /// The body of the commit message
-    body: Option<String>,
+    body: Option<Span<'a>>,
     /// The footer of the commit message
-    footer: Option<String>,
+    footer: Option<Span<'a>>,
     /// The type of the commit message (e.g. feat, fix, chore, ...)
-    commit_type: String,
+    commit_type: Span<'a>,
     /// The scope of the commit message (e.g. backend, frontend, ...)
-    scope: Option<String>,
+    scope: Option<Span<'a>>,
     /// The subject of the commit message
-    subject: String,
+    subject: Span<'a>,
     /// The raw commit message
     raw: String,
 }
 
 fn parse_commit(pairs: pest::iterators::Pairs<Rule>) -> Commit {
     let mut commit = Commit {
-        header: String::new(),
+        header: Option::expect(Span::new(&"", 0, 0), "span"),
         body: None,
         footer: None,
-        commit_type: String::new(),
+        commit_type: Option::expect(Span::new(&"", 0, 0), "span"),
         scope: None,
-        subject: String::new(),
-        raw: String::new(),
+        subject: Option::expect(Span::new(&"", 0, 0), "span"),
+        raw: String::from(""),
     };
 
     for pair in pairs {
         match pair.as_rule() {
             Rule::commit => {
-                commit.raw = pair.as_str().to_string();
+                commit.raw = String::from(pair.as_str());
 
                 for inner_pair in pair.into_inner() {
                     match inner_pair.as_rule() {
                         Rule::header => {
-                            commit.header = inner_pair.as_str().to_string();
+                            commit.header = inner_pair.as_span();
 
                             for header_pair in inner_pair.into_inner() {
                                 match header_pair.as_rule() {
-                                    Rule::commit_type => {
-                                        commit.commit_type = header_pair.as_str().to_string()
-                                    }
-                                    Rule::scope => {
-                                        commit.scope = Some(header_pair.as_str().to_string())
-                                    }
-                                    Rule::subject => {
-                                        commit.subject = header_pair.as_str().to_string()
-                                    }
+                                    Rule::commit_type => commit.commit_type = header_pair.as_span(),
+                                    Rule::scope => commit.scope = Some(header_pair.as_span()),
+                                    Rule::subject => commit.subject = header_pair.as_span(),
                                     _ => {}
                                 }
                             }
                         }
-                        Rule::body => commit.body = Some(inner_pair.as_str().to_string()),
-                        Rule::footer => commit.footer = Some(inner_pair.as_str().to_string()),
-                        Rule::commit_type => commit.commit_type = inner_pair.as_str().to_string(),
-                        Rule::scope => commit.scope = Some(inner_pair.as_str().to_string()),
-                        Rule::subject => commit.subject = inner_pair.as_str().to_string(),
+                        Rule::body => commit.body = Some(inner_pair.as_span()),
+                        Rule::footer => commit.footer = Some(inner_pair.as_span()),
+                        Rule::commit_type => commit.commit_type = inner_pair.as_span(),
+                        Rule::scope => commit.scope = Some(inner_pair.as_span()),
+                        Rule::subject => commit.subject = inner_pair.as_span(),
                         _ => {}
                     }
                 }
@@ -75,7 +71,32 @@ fn parse_commit(pairs: pest::iterators::Pairs<Rule>) -> Commit {
     commit
 }
 
-fn main() {
+fn rule_scope_enum(commit: &Commit) -> Option<Report> {
+    let allowed_scopes = vec!["backend", "frontend", "api"];
+
+    if let Some(scope) = commit.scope {
+        if !allowed_scopes.contains(&scope.as_str()) {
+            return Some(
+                miette!(
+                    severity = miette::Severity::Error,
+                    labels = vec![LabeledSpan::at(
+                        scope.start()..scope.end(),
+                        "not allowed scope"
+                    ),],
+                    help = "allowed scopes: backend, frontend, api",
+                    code = "rule/scope-enum",
+                    url = "https://example.com",
+                    "Scope not allowed",
+                )
+                .with_source_code(commit.raw.clone()),
+            );
+        }
+    }
+
+    None
+}
+
+fn main() -> Result<()> {
     let commit_message =
         "feat(nice): add cool feature\n\nsome body\n\nsecond body line\n\nsome footer";
 
@@ -85,6 +106,12 @@ fn main() {
 
     let commit = parse_commit(parsed);
     println!("{:#?}", commit);
+
+    if let Some(report) = rule_scope_enum(&commit) {
+        return Err(report)
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]
