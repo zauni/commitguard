@@ -1,12 +1,12 @@
 mod parser;
 
-use crate::parser::{parse_commit, Commit};
 use miette::{miette, LabeledSpan, Report, Result};
+use parser::{parse_commit, Commit};
 
 fn rule_scope_enum(commit: &Commit) -> Option<Report> {
     let allowed_scopes = vec!["backend", "frontend", "api"];
 
-    if let Some(scope) = commit.scope {
+    if let Some(scope) = &commit.scope {
         if !allowed_scopes.contains(&scope.as_str()) {
             return Some(
                 miette!(

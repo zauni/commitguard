@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use pest::{Parser, Span};
 use pest_derive::Parser;
 
@@ -5,20 +7,54 @@ use pest_derive::Parser;
 #[grammar = "commit.pest"]
 struct CommitParser;
 
-#[derive(Debug)]
+/// A span of a part of the commit message
+#[derive(Debug, Serialize)]
+pub struct CommitSpan<'a> {
+    input: &'a str,
+    start: usize,
+    end: usize,
+}
+
+impl<'a> CommitSpan<'a> {
+    fn new(input: &'a str, start: usize, end: usize) -> Self {
+        CommitSpan { input, start, end }
+    }
+
+    fn from(span: Span<'a>) -> Self {
+        CommitSpan {
+            input: span.as_str(),
+            start: span.start(),
+            end: span.end(),
+        }
+    }
+
+    pub fn as_str(&self) -> &'a str {
+        self.input
+    }
+
+    pub fn start(&self) -> usize {
+        self.start
+    }
+
+    pub fn end(&self) -> usize {
+        self.end
+    }
+}
+
+#[derive(Debug, Serialize)]
 pub struct Commit<'a> {
     /// The complete header of the commit message including the type, scope and subject
-    pub header: Span<'a>,
+    pub header: CommitSpan<'a>,
     /// The body of the commit message
-    pub body: Option<Span<'a>>,
+    pub body: Option<CommitSpan<'a>>,
     /// The footer of the commit message
-    pub footer: Option<Span<'a>>,
+    pub footer: Option<CommitSpan<'a>>,
     /// The type of the commit message (e.g. feat, fix, chore, ...)
-    pub commit_type: Span<'a>,
+    pub commit_type: CommitSpan<'a>,
     /// The scope of the commit message (e.g. backend, frontend, ...)
-    pub scope: Option<Span<'a>>,
+    pub scope: Option<CommitSpan<'a>>,
     /// The subject of the commit message
-    pub subject: Span<'a>,
+    pub subject: CommitSpan<'a>,
     /// The raw commit message
     pub raw: String,
 }
@@ -28,12 +64,12 @@ pub fn parse_commit(commit_msg: &str) -> Commit {
     println!("{:#?}", pairs);
 
     let mut commit = Commit {
-        header: Option::expect(Span::new(&"", 0, 0), "span"),
+        header: CommitSpan::new(&"", 0, 0),
         body: None,
         footer: None,
-        commit_type: Option::expect(Span::new(&"", 0, 0), "span"),
+        commit_type: CommitSpan::new(&"", 0, 0),
         scope: None,
-        subject: Option::expect(Span::new(&"", 0, 0), "span"),
+        subject: CommitSpan::new(&"", 0, 0),
         raw: String::from(""),
     };
 
@@ -45,22 +81,32 @@ pub fn parse_commit(commit_msg: &str) -> Commit {
                 for inner_pair in pair.into_inner() {
                     match inner_pair.as_rule() {
                         Rule::header => {
-                            commit.header = inner_pair.as_span();
+                            commit.header = CommitSpan::from(inner_pair.as_span());
 
                             for header_pair in inner_pair.into_inner() {
                                 match header_pair.as_rule() {
-                                    Rule::commit_type => commit.commit_type = header_pair.as_span(),
-                                    Rule::scope => commit.scope = Some(header_pair.as_span()),
-                                    Rule::subject => commit.subject = header_pair.as_span(),
+                                    Rule::commit_type => {
+                                        commit.commit_type = CommitSpan::from(header_pair.as_span())
+                                    }
+                                    Rule::scope => {
+                                        commit.scope = Some(CommitSpan::from(header_pair.as_span()))
+                                    }
+                                    Rule::subject => {
+                                        commit.subject = CommitSpan::from(header_pair.as_span())
+                                    }
                                     _ => {}
                                 }
                             }
                         }
-                        Rule::body => commit.body = Some(inner_pair.as_span()),
-                        Rule::footer => commit.footer = Some(inner_pair.as_span()),
-                        Rule::commit_type => commit.commit_type = inner_pair.as_span(),
-                        Rule::scope => commit.scope = Some(inner_pair.as_span()),
-                        Rule::subject => commit.subject = inner_pair.as_span(),
+                        Rule::body => commit.body = Some(CommitSpan::from(inner_pair.as_span())),
+                        Rule::footer => {
+                            commit.footer = Some(CommitSpan::from(inner_pair.as_span()))
+                        }
+                        Rule::commit_type => {
+                            commit.commit_type = CommitSpan::from(inner_pair.as_span())
+                        }
+                        Rule::scope => commit.scope = Some(CommitSpan::from(inner_pair.as_span())),
+                        Rule::subject => commit.subject = CommitSpan::from(inner_pair.as_span()),
                         _ => {}
                     }
                 }
@@ -94,7 +140,7 @@ mod tests {
                 want_err: false,
             },
             TestConfig {
-                name: String::from("subject missing"),
+                name: String::from("scope missing"),
                 commit: String::from("feat: add cool feature\n\nsome body\n\nsome footer"),
                 want_err: false,
             },
@@ -131,20 +177,23 @@ mod tests {
         ];
 
         for test_config in test_configs {
-            let result = CommitParser::parse(Rule::commit, &test_config.commit);
+            let parse_result = CommitParser::parse(Rule::commit, &test_config.commit);
+
             if test_config.want_err {
                 assert!(
-                    result.is_err(),
+                    parse_result.is_err(),
                     "{} | commit parse error = {:#?}",
                     test_config.name,
-                    result
+                    parse_result
                 );
             } else {
+                let result = parse_commit(&test_config.commit);
                 assert!(
-                    result.is_ok(),
+                    parse_result.is_ok(),
                     "{} | commit parse should be successfull",
                     test_config.name
                 );
+                insta::assert_yaml_snapshot!(test_config.name, result);
             }
         }
     }

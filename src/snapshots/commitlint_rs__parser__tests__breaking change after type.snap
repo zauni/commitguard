@@ -1,0 +1,24 @@
+---
+source: src/parser.rs
+expression: result
+---
+header:
+  input: "feat!: add cool feature"
+  start: 0
+  end: 23
+body:
+  input: "\n\nsome body"
+  start: 23
+  end: 34
+footer: ~
+commit_type:
+  input: feat
+  start: 0
+  end: 4
+scope: ~
+subject:
+  input: add cool feature
+  start: 7
+  end: 23
+raw: "feat!: add cool feature\n\nsome body"
+

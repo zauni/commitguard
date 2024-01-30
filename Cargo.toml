@@ -9,3 +9,7 @@ edition = "2021"
 miette = { version = "5.10.0", features = ["fancy"] }
 pest = "2.7.6"
 pest_derive = "2.7.6"
+serde = { version = "1.0.196", features = ["derive"] }
+
+[dev-dependencies]
+insta = { version = "1.34.0", features = ["yaml"] }
