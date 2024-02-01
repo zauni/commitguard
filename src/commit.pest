@@ -1,10 +1,11 @@
 commit = { SOI ~ header ~ body? ~ footer? ~ EOI }
 
-header = ${ commit_type ~ scope? ~ "!"? ~ ":" ~ WHITE_SPACE+ ~ subject }
+header = ${ commit_type ~ scope_with_braces? ~ "!"? ~ ":" ~ WHITE_SPACE+ ~ subject }
 
 commit_type = @{ ASCII_ALPHANUMERIC+ }
 
-scope = @{ "(" ~ ASCII_ALPHANUMERIC+ ~ ")" }
+scope = @{ ASCII_ALPHANUMERIC+ }
+scope_with_braces = _{ "(" ~ scope ~ ")" }
 
 subject = @{ text_without_newline }
 

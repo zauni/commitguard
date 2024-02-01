@@ -16,9 +16,9 @@ commit_type:
   start: 0
   end: 4
 scope:
-  input: (nice)
-  start: 4
-  end: 10
+  input: nice
+  start: 5
+  end: 9
 subject:
   input: add cool feature
   start: 12

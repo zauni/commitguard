@@ -174,6 +174,11 @@ mod tests {
                 commit: String::from("feat: add cool feature\nsome body"),
                 want_err: true,
             },
+            TestConfig {
+                name: String::from("random text"),
+                commit: String::from("Added a cool new feature"),
+                want_err: true,
+            },
         ];
 
         for test_config in test_configs {
