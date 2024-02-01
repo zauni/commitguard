@@ -1,0 +1,5 @@
+{
+  "rules": {
+    "scope-enum": ["error", "always", ["foo", "bar", "baz"]]
+  }
+}
