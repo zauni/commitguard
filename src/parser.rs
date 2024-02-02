@@ -28,8 +28,8 @@ impl<'a> CommitSpan<'a> {
         }
     }
 
-    pub fn as_str(&self) -> &'a str {
-        self.input
+    pub fn to_string(&self) -> String {
+        self.input.to_string()
     }
 
     pub fn start(&self) -> usize {
@@ -76,7 +76,7 @@ pub fn parse_commit(commit_msg: &str) -> Commit {
     for pair in pairs {
         match pair.as_rule() {
             Rule::commit => {
-                commit.raw = String::from(pair.as_str());
+                commit.raw = pair.as_str().to_string();
 
                 for inner_pair in pair.into_inner() {
                     match inner_pair.as_rule() {

@@ -7,14 +7,18 @@ use serde::Deserialize;
 
 fn rule_scope_enum(commit: &Commit, opts: &ScopeEnumOpts) -> Option<Report> {
     let severity = &opts.0;
-    let when = &opts.1;
+    let condition = &opts.1;
     let scopes = &opts.2;
 
+    if severity == &Severity::Off {
+        return None;
+    }
+
     if let Some(scope) = &commit.scope {
-        let is_in_scopes = scopes.contains(&scope.as_str().to_string());
-        let is_valid = match when {
-            When::Never => !is_in_scopes,
-            When::Always => is_in_scopes,
+        let is_in_scopes = scopes.contains(&scope.to_string());
+        let is_valid = match condition {
+            Condition::Never => !is_in_scopes,
+            Condition::Always => is_in_scopes,
         };
         if !is_valid {
             return Some(
@@ -22,14 +26,15 @@ fn rule_scope_enum(commit: &Commit, opts: &ScopeEnumOpts) -> Option<Report> {
                     severity = match severity {
                         Severity::Warning => miette::Severity::Warning,
                         Severity::Error => miette::Severity::Error,
+                        Severity::Off => miette::Severity::Advice,
                     },
                     labels = vec![LabeledSpan::at(
                         scope.start()..scope.end(),
                         "not allowed scope"
                     ),],
-                    help = String::from("scope must") + match when {
-                        When::Never => " not",
-                        When::Always => "",
+                    help = String::from("scope must") + match condition {
+                        Condition::Never => " not",
+                        Condition::Always => "",
                     } + " be one of " + &scopes.join(", "),
                     code = "rule/scope-enum",
                     url = "https://example.com",
@@ -44,25 +49,32 @@ fn rule_scope_enum(commit: &Commit, opts: &ScopeEnumOpts) -> Option<Report> {
 }
 
 /// Severity of the rule
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 enum Severity {
+    /// Turn off the rule
+    #[serde(rename = "off")]
+    Off,
+    /// Warn about the violation of a rule
     #[serde(rename = "warning")]
     Warning,
+    /// Error about the violation of a rule
     #[serde(rename = "error")]
     Error,
 }
 
 /// When the rule should be applied
 #[derive(Debug, Deserialize)]
-enum When {
+enum Condition {
+    /// The options should "never" be found (e.g. in a list of disallowed values)
     #[serde(rename = "never")]
     Never,
+    /// The options should "always" be found (e.g. in a list of allowed values)
     #[serde(rename = "always")]
     Always,
 }
 
 /// Options for the scope-enum rule
-type ScopeEnumOpts = (Severity, When, Vec<String>);
+type ScopeEnumOpts = (Severity, Condition, Vec<String>);
 
 /// Config all the rules
 #[derive(Debug, Deserialize)]
