@@ -1,5 +1,8 @@
 {
   "rules": {
-    "scope-enum": ["error", "always", ["foo", "bar", "baz"]]
+    "scope-empty": ["error", "never"],
+    "scope-enum": ["error", "always", ["foo", "bar", "baz"]],
+    "scope-max-length": ["error", 2],
+    "scope-case": ["error", "always", "lower-case"]
   }
 }

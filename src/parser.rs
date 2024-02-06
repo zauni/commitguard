@@ -8,7 +8,7 @@ use pest_derive::Parser;
 struct CommitParser;
 
 /// A span of a part of the commit message
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Default)]
 pub struct CommitSpan<'a> {
     input: &'a str,
     start: usize,
