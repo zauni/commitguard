@@ -62,15 +62,8 @@ mod tests {
 
     #[test]
     fn test_empty_scope() {
-        let commit = Commit {
-            header: Default::default(),
-            body: None,
-            footer: None,
-            commit_type: Default::default(),
-            scope: None,
-            subject: Default::default(),
-            raw: String::from(""),
-        };
+        let mut commit: Commit<'_> = Default::default();
+        commit.scope = None;
 
         // If the condition is `Never` and the scope is empty, the rule should return an error (read as "the scope should never be empty")
         let rule = ScopeEmptyRule {
@@ -89,15 +82,8 @@ mod tests {
 
     #[test]
     fn test_filled_scope() {
-        let commit = Commit {
-            header: Default::default(),
-            body: None,
-            footer: None,
-            commit_type: Default::default(),
-            scope: Some(Default::default()),
-            subject: Default::default(),
-            raw: String::from(""),
-        };
+        let mut commit: Commit<'_> = Default::default();
+        commit.scope = Some(Default::default());
 
         // If the condition is `Never` and the scope is filled, the rule should return `None` (read as "the scope should never be empty")
         let rule = ScopeEmptyRule {
@@ -116,15 +102,8 @@ mod tests {
 
     #[test]
     fn test_severity_off() {
-        let commit = Commit {
-            header: Default::default(),
-            body: None,
-            footer: None,
-            commit_type: Default::default(),
-            scope: Some(Default::default()),
-            subject: Default::default(),
-            raw: String::from(""),
-        };
+        let mut commit: Commit<'_> = Default::default();
+        commit.scope = Some(Default::default());
 
         // If the severity is `Off`, the rule should return `None`
         let rule = ScopeEmptyRule {

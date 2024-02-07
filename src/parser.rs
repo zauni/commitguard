@@ -16,7 +16,7 @@ pub struct CommitSpan<'a> {
 }
 
 impl<'a> CommitSpan<'a> {
-    fn new(input: &'a str, start: usize, end: usize) -> Self {
+    pub fn new(input: &'a str, start: usize, end: usize) -> Self {
         CommitSpan { input, start, end }
     }
 
@@ -57,6 +57,26 @@ pub struct Commit<'a> {
     pub subject: CommitSpan<'a>,
     /// The raw commit message
     pub raw: String,
+}
+
+impl Commit<'_> {
+    pub fn new() -> Self {
+        Commit {
+            header: CommitSpan::default(),
+            body: None,
+            footer: None,
+            commit_type: CommitSpan::default(),
+            scope: None,
+            subject: CommitSpan::default(),
+            raw: String::from(""),
+        }
+    }
+}
+
+impl Default for Commit<'_> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 pub fn parse_commit(commit_msg: &str) -> Commit {

@@ -67,13 +67,16 @@ enum TargetCase {
 
 /// Options for all rules without options
 #[derive(Debug, Deserialize)]
-pub(crate) struct NoOpts(Severity, Condition);
+pub struct NoOpts(Severity, Condition);
 /// Options for all enum rules
-type EnumOpts = (Severity, Condition, Vec<String>);
+#[derive(Debug, Deserialize)]
+pub struct EnumOpts(Severity, Condition, Vec<String>);
 /// Options for all length rules
-type LengthOpts = (Severity, usize);
+#[derive(Debug, Deserialize)]
+pub struct LengthOpts(Severity, usize);
 /// Options for all case rules
-type CaseOpts = (Severity, Condition, TargetCase);
+#[derive(Debug, Deserialize)]
+pub struct CaseOpts(Severity, Condition, TargetCase);
 
 /// Config all the rules
 #[derive(Debug, Deserialize)]

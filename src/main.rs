@@ -37,7 +37,7 @@ fn main() -> ExitCode {
     }
 
     println!(
-        "You have {} warnings and {} errors",
+        "There are {} warnings and {} errors",
         lint_result.warnings_len(),
         lint_result.errors_len()
     );
