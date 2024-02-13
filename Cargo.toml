@@ -2,6 +2,13 @@
 name = "commitlint-rs"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "A commitlint implementation in Rust"
+readme = "README.md"
+homepage = "https://github.com/zauni/commitlint-rs"
+repository = "https://github.com/zauni/commitlint-rs"
+keywords = ["cli", "commitlint", "git", "lint", "commit"]
+categories = ["command-line-utilities", "development-tools"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
