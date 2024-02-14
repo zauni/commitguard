@@ -109,7 +109,7 @@ impl LintResult {
 
     pub fn errors_len(&self) -> usize {
         match self.errors() {
-            None => return 0,
+            None => 0,
             Some(errors) => errors.len(),
         }
     }
@@ -124,7 +124,7 @@ impl LintResult {
 
     pub fn warnings_len(&self) -> usize {
         match self.warnings() {
-            None => return 0,
+            None => 0,
             Some(warnings) => warnings.len(),
         }
     }
