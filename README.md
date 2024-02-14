@@ -1,4 +1,4 @@
-# commitlint-rs
+# commitguard
 
 > A commitlint implementation in Rust.
 
@@ -13,7 +13,7 @@ Features:
 ## Installation
 
 ```sh
-cargo install commitlint-rs
+cargo install commitguard
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ cargo install commitlint-rs
 > Not quite yet, but it will be something like this:
 
 ```sh
-echo "foo" | commitlint-rs
+echo "foo" | commitguard
 ```
 
 ## Todos/Ideas:
@@ -36,6 +36,6 @@ echo "foo" | commitlint-rs
 8. Add website (probably Github pages) and add links to rule details
 9. Add devcontainer for easier getting started in VSCode
 10. Benchmark against original [commitlint](https://github.com/conventional-changelog/commitlint)
-11. Migration docs from original commitlint to commitlint-rs
+11. Migration docs from original commitlint to commitguard
 12. Allow 3rd party rules? Maybe WASM?
 13. Allow custom parsing?
