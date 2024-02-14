@@ -137,7 +137,7 @@ impl LintResult {
 pub fn run(commit: &Commit) -> LintResult {
     let settings = Config::builder()
         // Source can be `commitlint.config.toml` or `commitlint.config.json``
-        .add_source(config::File::with_name("src/commitlint.config"))
+        .add_source(config::File::with_name("src/commitguard.config"))
         .build()
         .unwrap();
 
