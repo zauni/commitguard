@@ -1,0 +1,3 @@
+[rules]
+
+scope-empty = ["error", "always"]

@@ -3,8 +3,8 @@ use crate::parser::Commit;
 use super::{Condition, NoOpts, Rule, Severity};
 use miette::{miette, LabeledSpan, Report};
 
-pub(crate) struct ScopeEmptyRule {
-    pub(crate) opts: NoOpts,
+pub struct ScopeEmptyRule {
+    pub opts: NoOpts,
 }
 
 impl Rule for ScopeEmptyRule {

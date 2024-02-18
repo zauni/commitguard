@@ -1,3 +1,5 @@
+use std::path;
+
 use config::Config;
 use serde::Deserialize;
 
@@ -7,13 +9,13 @@ pub mod scope_empty;
 pub mod scope_enum;
 pub mod scope_max_length;
 
-pub(crate) trait Rule {
+pub trait Rule {
     fn run(&self, commit: &Commit) -> Option<miette::Report>;
 }
 
 /// Severity of the rule
 #[derive(Debug, Deserialize, PartialEq)]
-pub(crate) enum Severity {
+pub enum Severity {
     /// Turn off the rule
     #[serde(rename = "off")]
     Off,
@@ -27,7 +29,7 @@ pub(crate) enum Severity {
 
 /// When the rule should be applied
 #[derive(Debug, Deserialize)]
-pub(crate) enum Condition {
+pub enum Condition {
     /// The options should "never" be found (e.g. in a list of disallowed values)
     #[serde(rename = "never")]
     Never,
@@ -68,12 +70,15 @@ enum TargetCase {
 /// Options for all rules without options
 #[derive(Debug, Deserialize)]
 pub struct NoOpts(Severity, Condition);
+
 /// Options for all enum rules
 #[derive(Debug, Deserialize)]
 pub struct EnumOpts(Severity, Condition, Vec<String>);
+
 /// Options for all length rules
 #[derive(Debug, Deserialize)]
 pub struct LengthOpts(Severity, usize);
+
 /// Options for all case rules
 #[derive(Debug, Deserialize)]
 pub struct CaseOpts(Severity, Condition, TargetCase);
@@ -135,9 +140,23 @@ impl LintResult {
 }
 
 pub fn run(commit: &Commit) -> LintResult {
+    let pwd = std::env::current_dir().unwrap_or_else(|_e| path::PathBuf::from("/"));
+    println!("Current directory: {}", pwd.display());
+
     let settings = Config::builder()
+        .add_source(config::File::from_str(
+            r#"
+          [rules]
+
+          scope-empty = ["error", "never"]
+          scope-enum = ["error", "always", ["foo", "bar", "baz"]]
+          scope-max-length = ["error", 20]
+          scope-case = ["error", "always", "lower-case"]
+        "#,
+            config::FileFormat::Toml,
+        ))
         // Source can be `commitlint.config.toml` or `commitlint.config.json``
-        .add_source(config::File::with_name("src/commitguard.config"))
+        .add_source(config::File::from(pwd.join("commitguard.config")).required(false))
         .build()
         .unwrap();
 
@@ -183,5 +202,5 @@ pub fn run(commit: &Commit) -> LintResult {
         }
     }
 
-    return lint_result;
+    lint_result
 }
