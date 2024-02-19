@@ -209,6 +209,11 @@ mod tests {
                 commit: String::from("Added a cool new feature"),
                 want_err: true,
             },
+            TestConfig {
+                name: String::from("no text"),
+                commit: String::new(),
+                want_err: true,
+            },
         ];
 
         for test_config in test_configs {
