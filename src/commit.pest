@@ -1,4 +1,4 @@
-commit = { SOI ~ header ~ body? ~ footer? ~ EOI }
+commit = { SOI ~ header ~ body? ~ footer? ~ NEWLINE* ~ EOI }
 
 header = ${ commit_type ~ scope_with_braces? ~ "!"? ~ ":" ~ WHITE_SPACE+ ~ subject }
 

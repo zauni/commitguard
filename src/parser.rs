@@ -170,6 +170,16 @@ mod tests {
                 want_err: false,
             },
             TestConfig {
+                name: String::from("body and footer missing with newline at the end (stdio input adds a newline)"),
+                commit: String::from("feat(nice): add cool feature\n"),
+                want_err: false,
+            },
+            TestConfig {
+                name: String::from("subject with whitespace at the end"),
+                commit: String::from("feat(nice): add cool feature \t "),
+                want_err: false,
+            },
+            TestConfig {
                 name: String::from("footer missing"),
                 commit: String::from("feat(nice): add cool feature\n\nsome body"),
                 want_err: false,
