@@ -183,7 +183,7 @@ pub fn run(commit: &Commit) -> LintResult {
         warnings: None,
     };
     for rule in rules {
-        if let Some(report) = rule.run(&commit) {
+        if let Some(report) = rule.run(commit) {
             match report.severity() {
                 Some(miette::Severity::Error) => {
                     if lint_result.errors.is_none() {

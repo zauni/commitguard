@@ -29,7 +29,7 @@ fn main() -> ExitCode {
 
     // read commit from stdin
     let mut buffer = String::new();
-    stdin().read_to_string(&mut buffer).unwrap_or_else(|_e| 0);
+    stdin().read_to_string(&mut buffer).unwrap_or(0);
     let commit = parse_commit(&buffer);
 
     let lint_result = rules::run(&commit);

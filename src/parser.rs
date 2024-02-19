@@ -84,12 +84,12 @@ pub fn parse_commit(commit_msg: &str) -> Commit {
     println!("{:#?}", pairs);
 
     let mut commit = Commit {
-        header: CommitSpan::new(&"", 0, 0),
+        header: CommitSpan::new("", 0, 0),
         body: None,
         footer: None,
-        commit_type: CommitSpan::new(&"", 0, 0),
+        commit_type: CommitSpan::new("", 0, 0),
         scope: None,
-        subject: CommitSpan::new(&"", 0, 0),
+        subject: CommitSpan::new("", 0, 0),
         raw: String::from(""),
     };
 
