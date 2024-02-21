@@ -92,8 +92,8 @@ struct RulesDetails {
     scope_enum: EnumOpts,
     #[serde(rename = "scope-max-length")]
     scope_max_length: LengthOpts,
-    #[serde(rename = "scope-case")]
-    scope_case: CaseOpts,
+    // #[serde(rename = "scope-case")]
+    // scope_case: CaseOpts,
 }
 
 /// Config

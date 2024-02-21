@@ -1,7 +1,12 @@
 mod parser;
 mod rules;
 
-use std::{env::current_dir, io::{stdin, Read}, path::PathBuf, process::ExitCode};
+use std::{
+    env::current_dir,
+    io::{stdin, Read},
+    path::PathBuf,
+    process::ExitCode,
+};
 
 use clap::Parser;
 use miette::GraphicalReportHandler;
