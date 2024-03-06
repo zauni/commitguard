@@ -186,6 +186,11 @@ mod tests {
                 want_err: false,
             },
             TestConfig {
+                name: String::from("multiple body lines"),
+                commit: String::from("feat(nice): add cool feature\n\nsome body\nnext body line\n\nthe real footer"),
+                want_err: false,
+            },
+            TestConfig {
                 name: String::from("breaking change after type"),
                 commit: String::from("feat!: add cool feature\n\nsome body"),
                 want_err: false,
@@ -194,6 +199,11 @@ mod tests {
                 name: String::from("breaking change after scope"),
                 commit: String::from("feat(nice)!: add cool feature\n\nsome body"),
                 want_err: false,
+            },
+            TestConfig {
+                name: String::from("only one newline after header"),
+                commit: String::from("feat(nice): add cool feature\nsome body"),
+                want_err: true,
             },
             TestConfig {
                 name: String::from("type missing"),

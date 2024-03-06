@@ -1,0 +1,30 @@
+---
+source: src/parser.rs
+expression: result
+---
+header:
+  input: "feat(nice): add cool feature"
+  start: 0
+  end: 28
+body:
+  input: "\n\nsome body\nnext body line"
+  start: 28
+  end: 54
+footer:
+  input: "\n\nthe real footer"
+  start: 54
+  end: 71
+commit_type:
+  input: feat
+  start: 0
+  end: 4
+scope:
+  input: nice
+  start: 5
+  end: 9
+subject:
+  input: add cool feature
+  start: 12
+  end: 28
+raw: "feat(nice): add cool feature\n\nsome body\nnext body line\n\nthe real footer"
+
