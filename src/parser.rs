@@ -187,7 +187,9 @@ mod tests {
             },
             TestConfig {
                 name: String::from("multiple body lines"),
-                commit: String::from("feat(nice): add cool feature\n\nsome body\nnext body line\n\nthe real footer"),
+                commit: String::from(
+                    "feat(nice): add cool feature\n\nsome body\nnext body line\n\nthe real footer",
+                ),
                 want_err: false,
             },
             TestConfig {
