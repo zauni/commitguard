@@ -17,8 +17,8 @@ use parser::parse_commit;
 #[command(version, about, long_about = None)]
 struct Cli {
     /// Path to the config file
-    #[arg(short, long, default_value = "commitlint.config")]
-    config_path: PathBuf,
+    #[arg(short, long, default_value = "commitguard.config")]
+    config_name: String,
 
     /// Current working directory
     #[arg(long, default_value = current_dir().unwrap_or_else(|_e| PathBuf::from("/")).into_os_string())]
@@ -26,18 +26,16 @@ struct Cli {
 }
 
 fn main() -> ExitCode {
-    // let commit_message =
-    //     "feat(nice): add cool feature\n\nsome body\n\nsecond body line\n\nsome footer";
-
-    // let commit = parse_commit(&commit_message);
-    // println!("{:#?}", commit);
+    let args = Cli::parse();
 
     // read commit from stdin
     let mut buffer = String::new();
     stdin().read_to_string(&mut buffer).unwrap_or(0);
     let commit = parse_commit(&buffer);
 
-    let lint_result = rules::run(&commit);
+    let config_path = args.cwd.join(args.config_name);
+    let lint_result = rules::run(&commit, config_path);
+
     let report_handler = GraphicalReportHandler::new();
 
     if lint_result.has_warnings() {
@@ -65,9 +63,6 @@ fn main() -> ExitCode {
         lint_result.warnings_len(),
         lint_result.errors_len()
     );
-
-    let args = Cli::parse();
-    println!("{:?}", args);
 
     if lint_result.has_errors() {
         return ExitCode::FAILURE;
