@@ -1,4 +1,4 @@
-use std::path;
+use std::path::PathBuf;
 
 use config::Config;
 use serde::Deserialize;
@@ -92,8 +92,8 @@ struct RulesDetails {
     scope_enum: EnumOpts,
     #[serde(rename = "scope-max-length")]
     scope_max_length: LengthOpts,
-    #[serde(rename = "scope-case")]
-    scope_case: CaseOpts,
+    // #[serde(rename = "scope-case")]
+    // scope_case: CaseOpts,
 }
 
 /// Config
@@ -139,10 +139,7 @@ impl LintResult {
     }
 }
 
-pub fn run(commit: &Commit) -> LintResult {
-    let pwd = std::env::current_dir().unwrap_or_else(|_e| path::PathBuf::from("/"));
-    println!("Current directory: {}", pwd.display());
-
+pub fn run(commit: &Commit, config_path: PathBuf) -> LintResult {
     let settings = Config::builder()
         .add_source(config::File::from_str(
             r#"
@@ -156,7 +153,7 @@ pub fn run(commit: &Commit) -> LintResult {
             config::FileFormat::Toml,
         ))
         // Source can be `commitlint.config.toml` or `commitlint.config.json``
-        .add_source(config::File::from(pwd.join("commitguard.config")).required(false))
+        .add_source(config::File::from(config_path).required(false))
         .build()
         .unwrap();
 
@@ -183,7 +180,7 @@ pub fn run(commit: &Commit) -> LintResult {
         warnings: None,
     };
     for rule in rules {
-        if let Some(report) = rule.run(&commit) {
+        if let Some(report) = rule.run(commit) {
             match report.severity() {
                 Some(miette::Severity::Error) => {
                     if lint_result.errors.is_none() {

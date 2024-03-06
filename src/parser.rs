@@ -1,3 +1,5 @@
+use std::fmt;
+
 use serde::Serialize;
 
 use pest::{Parser, Span};
@@ -28,16 +30,18 @@ impl<'a> CommitSpan<'a> {
         }
     }
 
-    pub fn to_string(&self) -> String {
-        self.input.to_string()
-    }
-
     pub fn start(&self) -> usize {
         self.start
     }
 
     pub fn end(&self) -> usize {
         self.end
+    }
+}
+
+impl fmt::Display for CommitSpan<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.input)
     }
 }
 
@@ -84,54 +88,49 @@ pub fn parse_commit(commit_msg: &str) -> Commit {
     println!("{:#?}", pairs);
 
     let mut commit = Commit {
-        header: CommitSpan::new(&"", 0, 0),
+        header: CommitSpan::new("", 0, 0),
         body: None,
         footer: None,
-        commit_type: CommitSpan::new(&"", 0, 0),
+        commit_type: CommitSpan::new("", 0, 0),
         scope: None,
-        subject: CommitSpan::new(&"", 0, 0),
+        subject: CommitSpan::new("", 0, 0),
         raw: String::from(""),
     };
 
     for pair in pairs {
-        match pair.as_rule() {
-            Rule::commit => {
-                commit.raw = pair.as_str().to_string();
+        if let Rule::commit = pair.as_rule() {
+            commit.raw = pair.as_str().to_string();
 
-                for inner_pair in pair.into_inner() {
-                    match inner_pair.as_rule() {
-                        Rule::header => {
-                            commit.header = CommitSpan::from(inner_pair.as_span());
+            for inner_pair in pair.into_inner() {
+                match inner_pair.as_rule() {
+                    Rule::header => {
+                        commit.header = CommitSpan::from(inner_pair.as_span());
 
-                            for header_pair in inner_pair.into_inner() {
-                                match header_pair.as_rule() {
-                                    Rule::commit_type => {
-                                        commit.commit_type = CommitSpan::from(header_pair.as_span())
-                                    }
-                                    Rule::scope => {
-                                        commit.scope = Some(CommitSpan::from(header_pair.as_span()))
-                                    }
-                                    Rule::subject => {
-                                        commit.subject = CommitSpan::from(header_pair.as_span())
-                                    }
-                                    _ => {}
+                        for header_pair in inner_pair.into_inner() {
+                            match header_pair.as_rule() {
+                                Rule::commit_type => {
+                                    commit.commit_type = CommitSpan::from(header_pair.as_span())
                                 }
+                                Rule::scope => {
+                                    commit.scope = Some(CommitSpan::from(header_pair.as_span()))
+                                }
+                                Rule::subject => {
+                                    commit.subject = CommitSpan::from(header_pair.as_span())
+                                }
+                                _ => {}
                             }
                         }
-                        Rule::body => commit.body = Some(CommitSpan::from(inner_pair.as_span())),
-                        Rule::footer => {
-                            commit.footer = Some(CommitSpan::from(inner_pair.as_span()))
-                        }
-                        Rule::commit_type => {
-                            commit.commit_type = CommitSpan::from(inner_pair.as_span())
-                        }
-                        Rule::scope => commit.scope = Some(CommitSpan::from(inner_pair.as_span())),
-                        Rule::subject => commit.subject = CommitSpan::from(inner_pair.as_span()),
-                        _ => {}
                     }
+                    Rule::body => commit.body = Some(CommitSpan::from(inner_pair.as_span())),
+                    Rule::footer => commit.footer = Some(CommitSpan::from(inner_pair.as_span())),
+                    Rule::commit_type => {
+                        commit.commit_type = CommitSpan::from(inner_pair.as_span())
+                    }
+                    Rule::scope => commit.scope = Some(CommitSpan::from(inner_pair.as_span())),
+                    Rule::subject => commit.subject = CommitSpan::from(inner_pair.as_span()),
+                    _ => {}
                 }
             }
-            _ => {}
         }
     }
 
@@ -170,8 +169,27 @@ mod tests {
                 want_err: false,
             },
             TestConfig {
+                name: String::from(
+                    "body and footer missing with newline at the end (stdio input adds a newline)",
+                ),
+                commit: String::from("feat(nice): add cool feature\n"),
+                want_err: false,
+            },
+            TestConfig {
+                name: String::from("subject with whitespace at the end"),
+                commit: String::from("feat(nice): add cool feature \t "),
+                want_err: false,
+            },
+            TestConfig {
                 name: String::from("footer missing"),
                 commit: String::from("feat(nice): add cool feature\n\nsome body"),
+                want_err: false,
+            },
+            TestConfig {
+                name: String::from("multiple body lines"),
+                commit: String::from(
+                    "feat(nice): add cool feature\n\nsome body\nnext body line\n\nthe real footer",
+                ),
                 want_err: false,
             },
             TestConfig {
@@ -183,6 +201,11 @@ mod tests {
                 name: String::from("breaking change after scope"),
                 commit: String::from("feat(nice)!: add cool feature\n\nsome body"),
                 want_err: false,
+            },
+            TestConfig {
+                name: String::from("only one newline after header"),
+                commit: String::from("feat(nice): add cool feature\nsome body"),
+                want_err: true,
             },
             TestConfig {
                 name: String::from("type missing"),
@@ -197,6 +220,11 @@ mod tests {
             TestConfig {
                 name: String::from("random text"),
                 commit: String::from("Added a cool new feature"),
+                want_err: true,
+            },
+            TestConfig {
+                name: String::from("no text"),
+                commit: String::new(),
                 want_err: true,
             },
         ];
