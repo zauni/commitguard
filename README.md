@@ -18,10 +18,8 @@ cargo install commitguard
 
 ## Usage
 
-> Not quite yet, but it will be something like this:
-
 ```sh
-echo "foo" | commitguard
+echo "feat(myscope): add new feature" | commitguard
 ```
 
 ## Todos/Ideas:
