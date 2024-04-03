@@ -5,6 +5,7 @@ use serde::Deserialize;
 
 use crate::parser::Commit;
 
+pub mod body_empty;
 pub mod scope_empty;
 pub mod scope_enum;
 pub mod scope_max_length;
@@ -86,6 +87,8 @@ pub struct CaseOpts(Severity, Condition, TargetCase);
 /// Config all the rules
 #[derive(Debug, Deserialize)]
 struct RulesDetails {
+    #[serde(rename = "body-empty")]
+    body_empty: NoOpts,
     #[serde(rename = "scope-empty")]
     scope_empty: NoOpts,
     #[serde(rename = "scope-enum")]
@@ -145,6 +148,7 @@ pub fn run(commit: &Commit, config_path: PathBuf) -> LintResult {
             r#"
           [rules]
 
+          body-empty = ["off", "never"]
           scope-empty = ["error", "never"]
           scope-enum = ["error", "always", ["foo", "bar", "baz"]]
           scope-max-length = ["error", 20]
@@ -159,10 +163,13 @@ pub fn run(commit: &Commit, config_path: PathBuf) -> LintResult {
 
     // Print out our settings
     let config: RulesConfig = settings.try_deserialize::<RulesConfig>().unwrap();
-    println!("{:?}", config);
+    // println!("{:?}", config);
 
     // create list of rules to iterate over them
     let rules: Vec<Box<dyn Rule>> = vec![
+        Box::new(body_empty::BodyEmptyRule {
+            opts: config.rules.body_empty,
+        }),
         Box::new(scope_empty::ScopeEmptyRule {
             opts: config.rules.scope_empty,
         }),
