@@ -121,8 +121,20 @@ pub fn parse_commit(commit_msg: &str) -> Commit {
                             }
                         }
                     }
-                    Rule::body => commit.body = Some(CommitSpan::from(inner_pair.as_span())),
-                    Rule::footer => commit.footer = Some(CommitSpan::from(inner_pair.as_span())),
+                    Rule::body_with_newlines => {
+                        for body_pair in inner_pair.into_inner() {
+                            if body_pair.as_rule() == Rule::body {
+                                commit.body = Some(CommitSpan::from(body_pair.as_span()))
+                            }
+                        }
+                    }
+                    Rule::footer_with_newlines => {
+                        for footer_pair in inner_pair.into_inner() {
+                            if footer_pair.as_rule() == Rule::footer {
+                                commit.footer = Some(CommitSpan::from(footer_pair.as_span()))
+                            }
+                        }
+                    }
                     Rule::commit_type => {
                         commit.commit_type = CommitSpan::from(inner_pair.as_span())
                     }

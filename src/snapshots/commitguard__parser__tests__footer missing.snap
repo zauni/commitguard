@@ -7,8 +7,8 @@ header:
   start: 0
   end: 28
 body:
-  input: "\n\nsome body"
-  start: 28
+  input: some body
+  start: 30
   end: 39
 footer: ~
 commit_type:

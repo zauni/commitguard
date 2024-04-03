@@ -7,12 +7,12 @@ header:
   start: 0
   end: 28
 body:
-  input: "\n\nsome body\nnext body line"
-  start: 28
+  input: "some body\nnext body line"
+  start: 30
   end: 54
 footer:
-  input: "\n\nthe real footer"
-  start: 54
+  input: the real footer
+  start: 56
   end: 71
 commit_type:
   input: feat

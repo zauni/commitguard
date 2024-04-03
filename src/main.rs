@@ -32,6 +32,7 @@ fn main() -> ExitCode {
     let mut buffer = String::new();
     stdin().read_to_string(&mut buffer).unwrap_or(0);
     let commit = parse_commit(&buffer);
+    // println!("{:#?}", commit);
 
     let config_path = args.cwd.join(args.config_name);
     let lint_result = rules::run(&commit, config_path);

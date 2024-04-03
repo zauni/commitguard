@@ -1,4 +1,4 @@
-commit = { SOI ~ header ~ body? ~ footer? ~ NEWLINE* ~ EOI }
+commit = { SOI ~ header ~ body_with_newlines? ~ footer_with_newlines? ~ NEWLINE? ~ EOI }
 
 header = ${ commit_type ~ scope_with_braces? ~ "!"? ~ ":" ~ WHITE_SPACE+ ~ subject }
 
@@ -9,8 +9,12 @@ scope_with_braces = _{ "(" ~ scope ~ ")" }
 
 subject = @{ text_without_newline }
 
-body = { NEWLINE{2, } ~ (!footer ~ ANY)+ }
+body_with_newlines = { min_two_newlines ~ body }
+body = { (!footer_with_newlines ~ ANY)+ }
 
-footer = @{ NEWLINE{2, } ~ text_without_newline ~ EOI }
+footer_with_newlines = { min_two_newlines ~ footer }
+footer = { text_without_newline }
 
-text_without_newline = { (!NEWLINE ~ ANY)+ }
+text_without_newline = _{ (!NEWLINE ~ ANY)+ }
+
+min_two_newlines = _{ NEWLINE{2, } }
